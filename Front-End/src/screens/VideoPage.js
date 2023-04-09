@@ -4,12 +4,14 @@ import { Video } from 'expo-av';
 import Chapters from '../screens/Chapters';
 import * as ScreenOrientation from 'expo-screen-orientation';
 import { useRoute } from '@react-navigation/native';
-
+import { usePreventScreenCapture } from 'expo-screen-capture';
+import client from "../config/config"
 const { width, height } = Dimensions.get('window');
 
 const VideoPage = ({navigation}) => {
+  usePreventScreenCapture(); //disabled screen capture
   const route = useRoute();
-  const { vedio, title, duration, percent, description, color,active } = route.params;
+  const { num,id,vedio, title,theme, duration, percent, description, color,active,dataLesson,dataCours } = route.params;
   const setOrientation = () => {
     if (Dimensions.get('window').height > Dimensions.get('window').width) {
       // Device is in portrait mode, rotate to landscape mode.
@@ -17,6 +19,74 @@ const VideoPage = ({navigation}) => {
     } else {
       // Device is in landscape mode, rotate to portrait mode.
       ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.PORTRAIT);
+    }
+  };
+ 
+  function getNextTheme(currentTheme, themes) {
+    const currentIndex = themes.findIndex(theme => theme.theme === currentTheme);
+    const nextIndex = (currentIndex + 1) % themes.length; // wrap around if at end
+    return themes[nextIndex].theme;
+  }
+
+  function getNextId(currentId, data) {
+    const currentIndex = data.findIndex(item => item.id === currentId);
+    const nextIndex = (currentIndex +1) % data.length; // wrap around if at end of array
+    return data[nextIndex].id;
+  }
+  const updatePercent = async (newPercent,id) => {
+    try {
+      const dataAPI = {
+        percent: newPercent,
+
+      };
+      const response = await client.put(`/lesson/${id}`, dataAPI, {
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+      });
+
+      console.log("response:", response.data);
+    } catch (error) {
+      console.error(" error:", error);
+    }
+  };
+  const updateActive = async (id) => {
+    try {
+      const dataAPI = {
+        active: 1,
+        
+      };
+      const response = await client.put(`/lesson/${id}`, dataAPI, {
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+      });
+
+      console.log("response:", response.data);
+    } catch (error) {
+      console.error(" error:", error);
+    }
+  };
+
+  const updateLocked = async (theme) => {
+    console.log(theme)
+    try {
+      const dataAPI = {
+        active: 1,
+        
+      };
+      const response = await client.put(`/cours/${theme}`, dataAPI, {
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+      });
+
+      console.log("response:", response.data);
+    } catch (error) {
+      console.error(" error:", error);
     }
   };
 
@@ -32,6 +102,16 @@ const VideoPage = ({navigation}) => {
 
         if (positionMillis > 0 && positionMillis === durationMillis) {
           console.log('Video finished playing');
+        }
+        if(percent<(positionMillis*100/durationMillis)){
+          updatePercent((positionMillis*100/durationMillis).toFixed(0),id)
+          if((positionMillis*100/durationMillis).toFixed(0)>=90){
+            if(num<(dataLesson.length-1)){
+              updateActive(getNextId(id, dataLesson))
+          }else {
+            updateLocked(getNextTheme(theme,dataCours ))
+          }
+          }
         }
       }
       navigation.goBack();
@@ -54,7 +134,7 @@ const VideoPage = ({navigation}) => {
         source={{ uri: vedio }}
         rate={1.0}
         isMuted={false}
-        resizeMode="cover"
+        resizeMode="stretch"
         shouldPlay={true}
         isLooping={false}
         useNativeControls
