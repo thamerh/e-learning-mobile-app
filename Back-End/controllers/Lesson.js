@@ -15,14 +15,14 @@ const storage = multer.diskStorage({
 export const upload = multer({ storage: storage });
 
 export const createLesson = async (req, res) => {
-  const { active, description, title, percent, theme } = req.body;
+  const {  description, title,  theme } = req.body;
 
   try {
     const cours = await Cours.findOne({ where: { theme: theme } });
     if (!cours) {
       return res.status(404).send("Cours not found");
     }
-
+    
     const { filename } = req.file;
     const filePath = `uploads/${filename}`;
     console.log(filePath)
@@ -30,16 +30,31 @@ export const createLesson = async (req, res) => {
     const duration = await getVideoDurationInSeconds(filePath).then((duration) => {
       return (duration);
   });
-
+  const lessonPos = await Lesson.findOne({ where: { theme: theme } });
+  if(lessonPos==null){
     const lesson = await Lesson.create({
-      active,
+      active:1,
       description,
       title,
-      percent,
+      percent:0,
       filename,
       theme,
       duration
     });
+    res.status(201).json(lesson);
+  }else{
+    const lesson = await Lesson.create({
+      active:0,
+      description,
+      title,
+      percent:0,
+      filename,
+      theme,
+      duration
+    });
+    res.status(201).json(lesson);
+  }
+    
     
       const updatedDuration = cours.duration + duration;
       const updatedNbLessons = cours.nbLessons + 1;
@@ -48,7 +63,7 @@ export const createLesson = async (req, res) => {
         { where: { theme } }
       );
 
-    res.status(201).json(lesson);
+   
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Error uploading video" });
@@ -85,6 +100,7 @@ export const updateLesson = async (req, res) => {
 export const deleteLesson = async (req, res) => {
   let id = req.params.id
   const lesson = await Lesson.findOne({ where: { id: id } });
+  console.log(lesson)
   const cours = await Cours.findOne({ where: { theme: lesson.theme } });
   await Lesson.destroy({ where: { id }} )
   const updatedDuration = cours.duration - lesson.duration;
