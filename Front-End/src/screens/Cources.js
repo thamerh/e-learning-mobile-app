@@ -1,135 +1,88 @@
-import React from "react";
-import { View, Text, StyleSheet, ScrollView } from "react-native";
+import React,{useState,useEffect} from "react";
+import {  Text, StyleSheet, ScrollView } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { Modalize } from "react-native-modalize";
-
+import client from "../config/config"
+import { useIsFocused } from '@react-navigation/native';
 import CourseList from "../screens/CourseList";
-const data = {
-  infractions: "المخالفات و العقوبات",
-  panneaux: "العلامات و الإشارات",
-  priorite: "الأولوية",
-  regles: "قواعد الجولان",
-  secourisme: "الإسعافات الأولية",
-  croisement: "المقاطعة و المجاوزة",
-  vehicules: "السّواق و العربات",
-  arret: "الوقوف و التّوقف",
-  mecanique: "الصّيانة",
-  themeMd: "نقل المواد الخطرة",
-  themeC: "صنف ج",
-  themeA: "صنف أ",
-  themeB: "صنف ب",
-  themeCe: "صنف ج+ه",
-  themeD: "صنف د",
-  themeD1: "صنف د1",
-};
+
 
 const Courses = ({ navigation }) => {
+  const [dataSerie, setDataSerie] = useState([]);
+  const [dataCours, setDataCours] = useState([]);
+  const isFocused = useIsFocused();
+  const getChapterColor = (() => {
+    let lastIndexUsed = -1;
+    const colors = ["#c1fffb", "#b9fff2", "#b1ece7"];
+    return () => {
+      lastIndexUsed = (lastIndexUsed + 1) % colors.length;
+      return colors[lastIndexUsed];
+    };
+  })();
+  useEffect(() => {
+    if (isFocused) {
+      // Do something when this screen is focused
+      //console.log('This screen is focused.');
+      getDataCours();
+    }
+  }, [isFocused]);
+  const getDataCours = () => {
+    client
+      .get("/cours")
+      .then((response) => {
+        setDataSerie(response.data);
+        // console.log(response.data);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  };
+  function formatDuration(durationInSeconds) {
+    const hours = Math.floor(durationInSeconds / 3600);
+    const minutes = Math.floor((durationInSeconds % 3600) / 60);
+    const hoursText = hours > 0 ? `${hours} hour${hours > 1 ? 's' : ''}, ` : '';
+    const minutesText = `${minutes} minute${minutes > 1 ? 's' : ''}`;
+    return `${hoursText}${minutesText}`;
+  }
+  useEffect(() => {
+    if (isFocused) {
+      // Do something when this screen is focused
+      //console.log('This screen is focused.');
+      getDataCours();
+    }
+  }, [isFocused]);
+useEffect(() => {
+  if (dataSerie.length === 0) {
+    getDataCours();
+  }
+  // getDataCours();
+}, [dataSerie]);
 
-  const dataList = [
-    {
-      img: require("../images/infractions.jpg"),
-      title: data.infractions,
-      secreen:"infractions",
-      bg: "#c1fffb",
-      locked: true,
-    },
-    {
-      img: require("../images/panneaux.jpg"),
-      title: data.panneaux,
-      secreen:"panneaux",
-      bg: "#b9fff2",
-     
-    },
-    {
-      img: require("../images/priorite.jpg"),
-      title: data.priorite,
-      secreen:"priorite",
-      bg: "#b1ece7",
-    },
-    {
-      img: require("../images/regle.jpg"),
-      title: data.regles,
-      secreen:"regles", 
-      bg: "#c1fffb",
-    },
-    {
-      img: require("../images/secourisme.jpg"),
-      title: data.secourisme,
-      secreen:"secourisme", 
-      bg: "#b9fff2",
-     
-    },
-    {
-      img: require("../images/priorite.jpg"),
-      title: data.croisement,
-      secreen:"croisement", 
-      bg: "#b1ece7",
-    },
-    {
-      img: require("../images/driver.jpg"),
-      title: data.vehicules,
-      secreen:"vehicules", 
-      bg: "#c1fffb",
-    },
-    {
-      img: require("../images/arret.jpg"),
-      title: data.arret,
-      secreen:"arret", 
-      bg: "#b9fff2",
-      
-    },
-    {
-      img: require("../images/mecanique.jpg"),
-      title: data.mecanique,
-      secreen:"mecanique", 
-      bg: "#b1ece7",
-    },
-    {
-      img: require("../images/md.jpg"),
-      title: data.themeMd,
-      secreen:"themeMd", 
-      bg: "#c1fffb",
-    },
-    {
-      img: require("../images/catC.jpg"),
-      title: data.themeC,
-      secreen:"themeC", 
-      bg: "#b9fff2",
-     
-    },
-    {
-      img: require("../images/catA.jpg"),
-      title: data.themeA,
-      secreen:"themeA", 
-      bg: "#b1ece7",
-    },
-    {
-      img: require("../images/catB.jpg"),
-      title: data.themeB,
-      secreen:"themeB", 
-      bg: "#c1fffb",
-    },
-    {
-      img: require("../images/catC1.jpg"),
-      title: data.themeCe,
-      secreen:"themeCe", 
-      bg: "#b9fff2",
-     
-    },
-    {
-      img: require("../images/catD.jpg"),
-      title: data.themeD,
-      secreen:"themeD", 
-      bg: "#b1ece7",
-    },
-    {
-      img: require("../images/catD1.jpg"),
-      title: data.themeD1,
-      secreen:"themeD1", 
-      bg: "#c1fffb",
-    },
-  ];
+useEffect(() => {
+  if(dataSerie.length>0){
+    makeData(dataSerie) 
+  }
 
+}, [dataSerie]);
+const makeData = (dataS) => {
+  let datas = [];
+  for (let i = 0; i < dataS.length; i++) {
+    let myObj = {
+      id: i,
+      img: `../images/${dataS[0].theme}.jpg`,
+      title:dataS[i].theme,
+      bg: getChapterColor(),
+      locked: dataS[i].active === 0 ? false : true,
+      description: dataS[i].description,
+      duration: formatDuration(dataS[i].duration),
+      nbLessons: dataS[i].nbLessons,
+    };
+    // console.log("objet ",myObj)
+    datas.push(myObj);
+  }
+
+  setDataCours(datas);
+};
   return (
     <LinearGradient
       colors={["rgb(94,245,213)", "rgb(19,188,175)", "rgb(31,238,198)"]}
@@ -180,18 +133,23 @@ const Courses = ({ navigation }) => {
     
         <ScrollView 
   style={{ flex: 1, backgroundColor: 'white' }} >
-  {dataList.map((item, index) => (
+  {dataCours.map((item, index) => (
     <CourseList
     key={index}
     onPress={() => item.locked === true ? navigation.push("Lesson", {
       title: item.title,
       img: item.img,
-      color: item.bg
+      color: item.bg,
+      description:item.description,
+      dataCours:dataSerie
     }) : null}
     img={item.img}
     title={item.title}
     bg={item.bg}
     locked={item.locked}
+    duration={item.duration}
+    nbLessons={item.nbLessons}
+    
   />
   
   ))}
