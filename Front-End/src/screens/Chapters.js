@@ -6,6 +6,7 @@ import { Fontisto } from '@expo/vector-icons';
 
 
 const Chapters = ({ title, num, duration, percent, color, onPress,active }) => {
+
   return (
     <TouchableOpacity
       onPress={onPress}
@@ -67,7 +68,7 @@ const Chapters = ({ title, num, duration, percent, color, onPress,active }) => {
           color: '#345c74',
           fontFamily: 'Medium',
           fontSize: 11,
-          width: 50,
+          width: 60,
           paddingLeft: 25,
         }}
       >
@@ -84,7 +85,7 @@ const Chapters = ({ title, num, duration, percent, color, onPress,active }) => {
       >
         <Image source={require('../images/pl.png')} />
       </ProgressCircle></>) :
-      <View style={{ paddingLeft: 50,}}>
+      <View style={{ paddingLeft: 57,}}>
       <ProgressCircle
         percent={30}
         radius={17}
