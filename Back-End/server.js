@@ -15,10 +15,9 @@ try {
 }
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
-// //static Vedio Folder
-// app.use('/Videos', express.static('./Videos'));
-
-// app.use(express.json());
+//static Vedio Folder
+app.use('/uploads', express.static('./uploads'));
+app.use(express.json());
 app.use(router);
 
 // testing 
