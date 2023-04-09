@@ -1,81 +1,169 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { View, Text, Image, ScrollView, TouchableOpacity } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { Modalize } from "react-native-modalize";
 import Chapters from "./Chapters";
 import { useRoute } from "@react-navigation/native";
+import data from "../config/StaticData";
+import client from "../config/config";
+import {backendURL} from "../config/BasedURL";
+import { useIsFocused } from '@react-navigation/native';
+
 
 const Lesson = ({ navigation }) => {
+  const [arabicTitle, setArabicTitle] = useState("");
+  const [image, setImage] = useState(null);
+  const [dataSerie, setDataSerie] = useState([]);
+  const [dataLesson, setDataLesson] = useState([]);
   const route = useRoute();
-  const handlePress=()=>{
+  const isFocused = useIsFocused();
+  function formatDuration(durationInSeconds) {
+    const hours = Math.floor(durationInSeconds / 3600);
+    const minutes = Math.floor((durationInSeconds % 3600) / 60);
+    const hoursText = hours > 0 ? `${hours} hour${hours > 1 ? "s" : ""}, ` : "";
+    const minutesText = `${minutes} minute${minutes > 1 ? "s" : ""}`;
+    return `${hoursText}${minutesText}`;
+  }
+  const handlePress = () => {
     //console.log("WrittingCoppy")
     navigation.push("WrittingCoppy", {
-      title,
-      content:"أهم المخالفات في قانون الطرقات التونسي\nالمخالفات (ملخص )\n\nv مخالفة عادية: خطية 20د\n· عدم استعمال أضواء تغيير الاتجاه\n· السير في الاتجاه الممنوع\n· الوقوف والتوقف بالأماكن الممنوعة ما عدا (بالطريق السيارة)\n· الوقوف بكيفية تكون فيها عجلتين على الرصيف وعجلتين على المعبّد.\n· السير بدون عجلة احتياطية\nv مخالفة خطيرة: خطية مالية أقصاها 60د\n· السير ليلا بدون إنارة\n· عدم استعمال الأضواء المناسبة (ضباب، أمطار)\n· عدم احترام الأولوية\n· عدم فسح المجال للعربات المستعملة للمنبهات الصّوتية (الحماية، الإسعاف..)\n· الوقوف والتوقف بجانب الوقوف الاضطراري بالطريق السيارة بدون موجب\n· تجاوز السرعة القصوى المسموح بها بأقل من 20 كلم/س\n· السير برخصة سياقة معلقة الصلوحية\nv الجنـــح:\nØ صنف 1: خطة مالية أقصاها 100د وعقوبة بالسجن مدة شهر واحد أو إحداهما وسحب الرخصة من 1 إلى 6 أشهر.\n· عدم احترام علامة قف\n· عدم احترام الإشارات الضوئية\n· اختراق سكة حديديّة نزول الحواجز أو اشتغال الضوء\n· المجاوزة الممنوعة\n· صنف2: خطية مالية أقصاها 200د وسحب الرخصة من 1 إلى 6 أشهر\n· استعمال عربة تحدث ضجيجا أو ترسل أدخنة كثيفة يتجاوز المقاييس المسموح بها بنسبة تفوق 50%.",
-      img:img,
-    })
-  }
-  const { title, img } = route.params;
-  const vedio ="http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4";
+      title: arabicTitle,
+      content: description,
+      img: image,
+    });
+  };
+  const { title, description,dataCours } = route.params;
+  const getDataLesson = (title) => {
+    client
+      .get("/lesson")
+      .then((response) => {
+        const items= response.data
+        const filteredItems = items.filter(item => item.theme === title);
+        setDataSerie(filteredItems);
+       
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  };
+  useEffect(() => {
+    if (isFocused) {
+      // Do something when this screen is focused
+      //console.log('This screen is focused.');
+     getDataLesson(title);
+    }
+  }, [isFocused]);
+  useEffect(() => {
+    if (dataSerie.length === 0) {
+      getDataLesson(title);
+    }
+    // getDataCours();
+  }, [dataSerie]);
+
+  useEffect(() => {
+    switch (title) {
+      case "infractions":
+        setArabicTitle(data.infractions);
+        setImage(require("../images/infractions.jpg"));
+        break;
+      case "panneaux":
+        setArabicTitle(data.panneaux);
+        setImage(require("../images/panneaux.jpg"));
+        break;
+      case "priorite":
+        setArabicTitle(data.priorite);
+        setImage(require("../images/priorite.jpg"));
+        break;
+      case "regles":
+        setArabicTitle(data.regles);
+        setImage(require("../images/regle.jpg"));
+        break;
+      case "secourisme":
+        setArabicTitle(data.secourisme);
+        setImage(require("../images/secourisme.jpg"));
+        break;
+      case "croisement":
+        setArabicTitle(data.croisement);
+        setImage(require("../images/priorite.jpg"));
+        break;
+      case "vehicules":
+        setArabicTitle(data.vehicules);
+        setImage(require("../images/driver.jpg"));
+        break;
+      case "arret":
+        setArabicTitle(data.arret);
+        setImage(require("../images/arret.jpg"));
+        break;
+      case "mecanique":
+        setArabicTitle(data.mecanique);
+        setImage(require("../images/mecanique.jpg"));
+        break;
+      case "themeMd":
+        setArabicTitle(data.themeMd);
+        setImage(require("../images/md.jpg"));
+        break;
+      case "themeC":
+        setArabicTitle(data.themeC);
+        setImage(require("../images/catC.jpg"));
+        break;
+      case "themeA":
+        setArabicTitle(data.themeA);
+        setImage(require("../images/catA.jpg"));
+        break;
+      case "themeB":
+        setArabicTitle(data.themeB);
+        setImage(require("../images/catB.jpg"));
+        break;
+      case "themeCe":
+        setArabicTitle(data.themeCe);
+        setImage(require("../images/catC1.jpg"));
+        break;
+      case "themeD":
+        setArabicTitle(data.themeD);
+        setImage(require("../images/catD.jpg"));
+        break;
+      case "themeD1":
+        setArabicTitle(data.themeD1);
+        setImage(require("../images/catD1.jpg"));
+        break;
+    }
+  }, [title, data]);
+  // const vedio ="http://localhost:8000/uploads/1680969774422-338953725_8976824145720843_879641568784864665_n.mp4";
   const getChapterColor = (() => {
     let lastIndexUsed = -1;
     const colors = ["#c1fffb", "#b9fff2", "#b1ece7"];
-  
+
     return () => {
       lastIndexUsed = (lastIndexUsed + 1) % colors.length;
       return colors[lastIndexUsed];
     };
   })();
 
-
-const chaptersData = [
-  {
-    num: 1,
-    color: getChapterColor(),
-    percent: 25,
-    duration: "1 hours, 12 minutes",
-    title: "مقدمة",
-    description:"يمثل هذا الدرس كمقدمة عامة على محور المخالفات والعقوبات",
-  },
-  {
-    num: 2,
-    color: getChapterColor(),
-    percent: 50,
-    duration: "1 hours, 12 minutes",
-    title: "قائمة في المخالفات المرورية",
-    description:"يمثل هذا الدرس كمقدمة عامة على محور المخالفات والعقوبات",
-  },
-  {
-    num: 3,
-    color: getChapterColor(),
-    percent: 0,
-    duration: "1 hours, 12 minutes",
-    title: "قائمة في الجنح المرورية",
-    description:"يمثل هذا الدرس كمقدمة عامة على محور المخالفات والعقوبات",
-  },
-  {
-    num: 4,
-    color: getChapterColor(),
-    percent: 0,
-    duration: "2 hours, 20 minutes",
-    title: "قائمة في الجنايات المرورية",
-    description:"يمثل هذا الدرس كمقدمة عامة على محور المخالفات والعقوبات",
-  },
-  {
-    num: 5,
-    color: getChapterColor(),
-    percent: 0,
-    duration: "0 hours, 30 minutes",
-    title: "الخاتمة",
-    description:"يمثل هذا الدرس كمقدمة عامة على محور المخالفات والعقوبات",
-  },
-];
-const activeIndex = 2; // set the active index here
-const updatedChaptersData = chaptersData.map((chapter, index) => ({
-  ...chapter,
-  active: index < activeIndex ? 'active' : null,
-}));
-
+  useEffect(() => {
+    if (dataSerie.length > 0) {
+      makeData(dataSerie);
+    }
+  }, [dataSerie]);
+  const makeData = (dataS) => {
+    let datas = [];
+    for (let i = 0; i < dataS.length; i++) {
+      let myObj = {
+        num: i,
+        id: dataS[i].id,
+        vedio: `${backendURL}/uploads/${dataS[0].filename}`,
+        title: dataS[i].title,
+        color: getChapterColor(),
+        active: dataS[i].active === 0 ? false : true,
+        description: dataS[i].description,
+        duration: formatDuration(dataS[i].duration),
+        theme: dataS[i].theme,
+        percent: dataS[i].percent,
+      };
+       console.log("objet ",myObj)
+      datas.push(myObj);
+    }
+    setDataLesson(datas);
+  };
 
   return (
     <LinearGradient
@@ -86,7 +174,7 @@ const updatedChaptersData = chaptersData.map((chapter, index) => ({
       locations={[0, 0.49, 1]}
     >
       <Image
-        source={img}
+        source={image}
         style={{
           height: 80,
           width: 80,
@@ -108,7 +196,7 @@ const updatedChaptersData = chaptersData.map((chapter, index) => ({
           textAlign: "center",
         }}
       >
-        {title}
+        {arabicTitle}
       </Text>
 
       <Modalize
@@ -138,7 +226,7 @@ const updatedChaptersData = chaptersData.map((chapter, index) => ({
       >
         <View style={{ marginTop: 15 }}>
           <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false}>
-            {updatedChaptersData.map((chapter, index) => (
+            {dataLesson.map((chapter, index) => (
               <Chapters
                 key={index}
                 num={chapter.num}
@@ -146,43 +234,57 @@ const updatedChaptersData = chaptersData.map((chapter, index) => ({
                 percent={chapter.percent}
                 duration={chapter.duration}
                 title={chapter.title}
-                onPress={chapter.active ?()=> navigation.push("VideoPage", {
-                  vedio,
-                  title:chapter.title,
-                  duration: chapter.duration,
-                  percent: chapter.percent,
-                  description:chapter.description,
-                  color:chapter.color,
-                  active:chapter.active
-                }):null}
+                onPress={
+                  chapter.active
+                    ? () =>
+                        navigation.push("VideoPage", {
+                          id:chapter.id,
+                          vedio: chapter.vedio,
+                          title: chapter.title,
+                          theme: title,
+                          duration: chapter.duration,
+                          percent: chapter.percent,
+                          description: chapter.description,
+                          color: chapter.color,
+                          active: chapter.active,
+                          img: chapter.img,
+                          dataLesson:dataLesson,
+                          dataCours:dataCours,
+                          num:chapter.num
+                        })
+                    : null
+                }
                 active={chapter.active}
               />
             ))}
-           <TouchableOpacity onPress={handlePress}>
-  <View style={{
-    flexDirection: "row",
-    paddingVertical: 5,
-    backgroundColor: "#13BCAF",
-    marginHorizontal: 40,
-    paddingVertical: 15,
-    alignItems: "center",
-    borderRadius: 10,
-    justifyContent: "center",
-    marginTop: 20
-  }}>
-    <Text style={{
-      color: "#FFF",
-      fontFamily: "Bold",
-      fontSize: 15,
-      marginRight: 50
-    }}>
-      النسخة المكتوبة لهذا المحور
-    </Text>
-    <Image source={require('../images/a3.png')} />
-  </View>
-</TouchableOpacity>
+            <TouchableOpacity onPress={handlePress}>
+              <View
+                style={{
+                  flexDirection: "row",
+                  paddingVertical: 5,
+                  backgroundColor: "#13BCAF",
+                  marginHorizontal: 40,
+                  paddingVertical: 15,
+                  alignItems: "center",
+                  borderRadius: 10,
+                  justifyContent: "center",
+                  marginTop: 20,
+                }}
+              >
+                <Text
+                  style={{
+                    color: "#FFF",
+                    fontFamily: "Bold",
+                    fontSize: 15,
+                    marginRight: 50,
+                  }}
+                >
+                  ملخص هذا المحور
+                </Text>
+                <Image source={require("../images/a3.png")} />
+              </View>
+            </TouchableOpacity>
           </ScrollView>
-          
         </View>
       </Modalize>
     </LinearGradient>
