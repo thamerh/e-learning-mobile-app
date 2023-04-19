@@ -60,13 +60,17 @@ Contributions are welcome! If you find a bug or have a feature request, please o
 # secreen shot 
 
 ### courses secreen
-![](https://github.com/thamerh/e-learning-mobile-app/blob/bd36052e0a275224120c5197ed89c120b7f7a347/SecreenShot/340456688_1730289047423943_4062556325124743558_n.jpg)
+<img src="https://github.com/thamerh/e-learning-mobile-app/blob/bd36052e0a275224120c5197ed89c120b7f7a347/SecreenShot/340456688_1730289047423943_4062556325124743558_n.jpg" width="200" height="500">
+
 ### Lesson secreen
-![](https://github.com/thamerh/e-learning-mobile-app/blob/bd36052e0a275224120c5197ed89c120b7f7a347/SecreenShot/340295076_138191409042819_3407907018586420447_n.jpg)
+<img src="https://github.com/thamerh/e-learning-mobile-app/blob/bd36052e0a275224120c5197ed89c120b7f7a347/SecreenShot/340295076_138191409042819_3407907018586420447_n.jpg" width="200" height="500">
+
 ### resume secreen
-![](https://github.com/thamerh/e-learning-mobile-app/blob/bd36052e0a275224120c5197ed89c120b7f7a347/SecreenShot/338714724_981048779467595_7834162384808676466_n.jpg)
+<img src="https://github.com/thamerh/e-learning-mobile-app/blob/bd36052e0a275224120c5197ed89c120b7f7a347/SecreenShot/338714724_981048779467595_7834162384808676466_n.jpg" width="200" height="500">
+
 ### vedio secreen
-![](https://github.com/thamerh/e-learning-mobile-app/blob/bd36052e0a275224120c5197ed89c120b7f7a347/SecreenShot/338677894_935979517653928_8104990122738058581_n.jpg)
+<img src="https://github.com/thamerh/e-learning-mobile-app/blob/bd36052e0a275224120c5197ed89c120b7f7a347/SecreenShot/338677894_935979517653928_8104990122738058581_n.jpg" width="200" height="500">
+
 
 
 
